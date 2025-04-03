@@ -24,7 +24,7 @@ services:
       - KC_DB_PASSWORD=prodigy
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME=172.105.75.119 
       - KC_HTTP_RELATIVE_PATH=/auth
     command:
       - start-dev
