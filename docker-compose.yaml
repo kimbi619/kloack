@@ -25,27 +25,22 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_HOSTNAME=172.105.75.119
-      - KC_HTTP_RELATIVE_PATH=/auth
       - KC_HTTPS_PORT=8443
       - KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt
       - KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key
-      - KC_PROXY=edge
       - KC_HTTP_ENABLED=true
-      - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
-      - KC_SPI_ALLOWED_ORIGINS="http://172.105.75.119:3001"
-    command:
-      - start
-    ports:
-      - "8080:8080"
-      - "8443:8443"
+      - KC_SPI_ALLOWED_ORIGINS=http://172.105.75.119:3001
     volumes:
       - ~/kloack/certs/server.crt:/opt/keycloak/conf/server.crt:ro
       - ~/kloack/certs/server.key:/opt/keycloak/conf/server.key:ro
+    user: root
+    command:
+      - start-dev
+    ports:
+      - "8443:8443"
     depends_on:
       - db
-    restart: always
-    user: root  
+    restart: always  
       
   backend:
     build:
