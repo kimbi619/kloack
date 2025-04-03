@@ -74,8 +74,8 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - REACT_APP_BACKEND_URL=http://172.105.75.119:8000
-      - REACT_APP_KEYCLOAK_URL=http://172.105.75.119:8000/auth
+      - REACT_APP_BACKEND_URL=https://172.105.75.119/api
+      - REACT_APP_KEYCLOAK_URL=https://172.105.75.119/auth
       - REACT_APP_KEYCLOAK_REALM=kloack
       - REACT_APP_KEYCLOAK_CLIENT_ID=backend-service
     depends_on:
@@ -83,6 +83,22 @@ services:
       - keycloak
     restart: always
     command: sh -c "npm install && npm start"
+
+  nginx:
+    image: nginx:alpine
+    container_name: "nginx"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - keycloak
+      - backend
+      - frontend
+    restart: always
 
 volumes:
   postgres_data:
