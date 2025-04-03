@@ -79,7 +79,7 @@ def callback(request):
     Handle the callback from Keycloak after successful authentication
     """
     code = request.GET.get('code')
-    redirect_uri = request.GET.get('redirect_uri', 'http://172.105.75.119:3000/callback')
+    redirect_uri = request.GET.get('redirect_uri', 'http://172.105.75.119:3001/callback')
     
     if not code:
         return JsonResponse({"error": "No authorization code provided"}, status=400)

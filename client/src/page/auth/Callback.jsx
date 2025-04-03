@@ -22,7 +22,7 @@ const Callback = () => {
         setStatus('Received authorization code, finalizing login...');
         
         const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL || 'http://172.105.75.119:8000'}/api/callback/`,
+          `${process.env.REACT_APP_BACKEND_URL}/callback/`,
           {
             params: {
               code,
