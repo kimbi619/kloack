@@ -7,7 +7,13 @@ SECRET_KEY = os.getenv('SECRET', 'dp#du&g*zy-v59vxb95vfo7d9=-@b420n!rmsgzs')
 
 DEBUG = os.getenv('DEBUG', 'True')
 
-ALLOWED_HOSTS = ['*', 'localhost:3000']
+
+ALLOWED_HOSTS = ['http://172.105.75.119:3001', 'http://172.105.75.119:3000', 'http://172.105.75.119:8000', "172.105.75.119:3001", "172.105.75.119:3001", '*'] 
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = ['http://172.105.75.119:3001']
+
 
 
 # Application definition
