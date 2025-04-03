@@ -52,11 +52,11 @@ services:
       dockerfile: Dockerfile
     container_name: "client"
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       - backend
     restart: always
-
+    command: sh -c "npm install && npm start"
 
 
 volumes:
