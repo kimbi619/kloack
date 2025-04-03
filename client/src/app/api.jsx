@@ -46,7 +46,7 @@ const apiRequest = async (method, url, data = null, customHeaders = {}) => {
 export const keycloakAuth = async (username, password) => {
   const payload = {
     client_id: CLIENT_ID,
-    client_secret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET || 'lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK',
+    client_secret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET || 'W9jM7wJPljd6DaDFO9KG6zZ4bBq1Ny5P',
     grant_type: 'password',
     username,
     password
