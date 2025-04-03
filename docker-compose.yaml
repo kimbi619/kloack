@@ -1,0 +1,65 @@
+version: '3.3'
+
+services:
+  
+
+  db:
+    image: "postgres:14-alpine"
+    container_name: "postgres"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prodigy
+      - POSTGRES_DB=keycloak
+    ports:
+      - "5433:5432"
+    restart: always
+
+
+      
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: "backend"
+    command: >
+      sh -c "python run.py migrate &&
+      python run.py runserver 0.0.0.0:8000"
+
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prodigy
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - KEYCLOAK_URL=http://localhost:8080
+      - KEYCLOAK_REALM=kloack
+      - KEYCLOAK_CLIENT_ID=backend-service
+      - KEYCLOAK_CLIENT_SECRET=yQrcRopRHtIIC5QIkdR7fe2PR9rDCMwo
+    depends_on:
+      - db
+    restart: always
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: "client"
+    volumes:
+      - ./client:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
+
+
+
+volumes:
+  postgres_data:
