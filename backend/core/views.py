@@ -84,14 +84,19 @@ def callback(request):
     if not code:
         return JsonResponse({"error": "No authorization code provided"}, status=400)
     
-    keycloak_openid = KeycloakOpenID(
-        server_url=settings.KEYCLOAK_CONFIG["SERVER_URL"],
-        client_id=settings.KEYCLOAK_CONFIG["CLIENT_ID"],
-        realm_name=settings.KEYCLOAK_CONFIG["REALM"],
-        client_secret_key=settings.KEYCLOAK_CONFIG["CLIENT_SECRET_KEY"]
-    )
-    
     try:
+        print(f"Processing callback with code: {code[:10]}... and redirect_uri: {redirect_uri}")
+        
+        keycloak_openid = KeycloakOpenID(
+            server_url=settings.KEYCLOAK_CONFIG["SERVER_URL"],
+            client_id=settings.KEYCLOAK_CONFIG["CLIENT_ID"],
+            realm_name=settings.KEYCLOAK_CONFIG["REALM"],
+            client_secret_key=settings.KEYCLOAK_CONFIG["CLIENT_SECRET_KEY"],
+            verify=False  
+        )
+        
+        print(f"Initialized KeycloakOpenID with server: {settings.KEYCLOAK_CONFIG['SERVER_URL']}")
+        
         token_response = keycloak_openid.token(
             grant_type="authorization_code",
             code=code,
@@ -113,8 +118,41 @@ def callback(request):
         })
         
     except Exception as e:
+        # Enhanced error reporting
+        import traceback
         print(f"Error in Keycloak callback: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
         return JsonResponse({
             "success": False,
             "error": str(e)
         }, status=400)
+
+
+@api_view(["GET"])
+def test_keycloak_connection(request):
+    """Test connection to Keycloak server"""
+    import requests
+    
+    server_url = settings.KEYCLOAK_CONFIG["SERVER_URL"]
+    try:
+        import urllib3
+        urllib3.disable_warnings()
+        
+        response = requests.get(
+            f"{server_url}/realms/{settings.KEYCLOAK_CONFIG['REALM']}/.well-known/openid-configuration",
+            verify=False,
+            timeout=10
+        )
+        
+        return JsonResponse({
+            "status": response.status_code,
+            "content": response.json() if response.status_code == 200 else None,
+            "server_url": server_url
+        })
+    except Exception as e:
+        import traceback
+        return JsonResponse({
+            "error": str(e),
+            "traceback": traceback.format_exc(),
+            "server_url": server_url
+        }, status=500)
