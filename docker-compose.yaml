@@ -63,7 +63,6 @@ services:
       - KEYCLOAK_CLIENT_SECRET=lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK
     depends_on:
       - db
-      - keycloak
     restart: always
 
   frontend:
