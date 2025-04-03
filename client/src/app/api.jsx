@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_KEYCLOAK_API_BASE_URL || 'http://https://172.105.75.119:8443';
+const API_BASE_URL = process.env.REACT_APP_KEYCLOAK_API_BASE_URL || 'https://172.105.75.119:8443';
 const REALM = process.env.REACT_APP_KEYCLOAK_REALM || 'kloack';
 const CLIENT_ID = process.env.REACT_APP_KEYCLOAK_CLIENT_ID || 'backend-service';
 const apiClient = axios.create({

@@ -10,7 +10,7 @@ const Home = () => {
       <Link to="/login">
         <button>Login</button>
       </Link>
-      <Link to="http://https://172.105.75.119:8443/realms/kloack/account">
+      <Link to="https://172.105.75.119:8443/realms/kloack/account">
         <button>Login with keycloak</button>
       </Link>
     </div>
