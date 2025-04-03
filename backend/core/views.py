@@ -7,32 +7,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.permissions import BasePermission
+from django.http import JsonResponse
+from django.conf import settings
+from keycloak import KeycloakOpenID
+from urllib.parse import urlencode
+import json
 
-
-class HasKeycloakRole(BasePermission):
-    """
-    Permission class to check if user has specific Keycloak roles
-    """
-    def __init__(self, required_roles):
-        self.required_roles = required_roles
-
-    def has_permission(self, request, view):
-        if not request.auth or 'payload' not in request.auth:
-            return False
-        
-        user_roles = request.auth["payload"].get("realm_access", {}).get("roles", [])
-        return any(role in user_roles for role in self.required_roles)
-
-
-class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user_roles = request.auth["payload"].get("realm_access", {}).get("roles", [])
-        return Response({
-            "message": f"Hello, {request.user.username}! You are authenticated with Keycloak.",
-            "roles": user_roles
-        })
 
 
 @api_view(["POST"])
@@ -56,3 +36,77 @@ def create_bank(request):
         return Response({"message": "Bank created successfully!", "data": serializer.data}, status=201)
     return Response(serializer.errors, status=400)
 
+
+
+
+@api_view(["GET"])
+def authenticate(request):
+    """
+    Generate a Keycloak authorization URL for redirecting the user to login
+    """
+    redirect_uri = request.GET.get('redirect_uri', 'http://localhost:3000/callback')
+    
+    try:
+        keycloak_openid = KeycloakOpenID(
+            server_url=settings.KEYCLOAK_CONFIG["SERVER_URL"],
+            client_id=settings.KEYCLOAK_CONFIG["CLIENT_ID"],
+            realm_name=settings.KEYCLOAK_CONFIG["REALM"],
+            client_secret_key=settings.KEYCLOAK_CONFIG["CLIENT_SECRET_KEY"]
+        )
+        
+        auth_url = keycloak_openid.auth_url(
+            redirect_uri=redirect_uri,
+            scope="openid email profile"
+        )
+        
+        return JsonResponse({"auth_url": auth_url})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+
+@api_view(["GET", "POST"])
+def callback(request):
+    """
+    Handle the callback from Keycloak after successful authentication
+    """
+    code = request.GET.get('code')
+    redirect_uri = request.GET.get('redirect_uri', 'http://localhost:3000/callback')
+    
+    if not code:
+        return JsonResponse({"error": "No authorization code provided"}, status=400)
+    
+    keycloak_openid = KeycloakOpenID(
+        server_url=settings.KEYCLOAK_CONFIG["SERVER_URL"],
+        client_id=settings.KEYCLOAK_CONFIG["CLIENT_ID"],
+        realm_name=settings.KEYCLOAK_CONFIG["REALM"],
+        client_secret_key=settings.KEYCLOAK_CONFIG["CLIENT_SECRET_KEY"]
+    )
+    
+    try:
+        token_response = keycloak_openid.token(
+            grant_type="authorization_code",
+            code=code,
+            redirect_uri=redirect_uri
+        )
+        
+        user_info = keycloak_openid.userinfo(token_response['access_token'])
+        
+        response_data = {
+            "token": token_response,
+            "user_info": user_info
+        }
+        
+        frontend_redirect_url = f"{redirect_uri.split('/callback')[0]}/auth-success?{urlencode({'token_data': json.dumps(response_data)})}"
+        
+        return JsonResponse({
+            "success": True,
+            "redirect_url": frontend_redirect_url
+        })
+        
+    except Exception as e:
+        print(f"Error in Keycloak callback: {str(e)}")
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        }, status=400)

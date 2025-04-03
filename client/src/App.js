@@ -4,19 +4,25 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
 
-function App() {
+function AppContent() {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
-  
-
 
   return (
-      <div className="App">
-        {isAuthenticated ? <PrivateRoute /> : <PublicRoute />}
-      </div>
+    <div className="App">
+      {isAuthenticated ? <PrivateRoute /> : <PublicRoute />}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

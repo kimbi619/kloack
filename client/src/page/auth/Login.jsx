@@ -1,5 +1,5 @@
-import { useState, useContext } from "react"
-import { Link, Navigate, useNavigate } from "react-router-dom"
+import { useState, useContext, useEffect } from "react"
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom"
 import "./Login.css"
 import { AuthContext } from "../../components/buttons/Buttons"
 import { keycloakAuth } from '../../app/api'
@@ -8,9 +8,11 @@ import useLocalStorage from '../../hooks/UseLocalStorage'
 import Github from '../../assets/icons/github.svg'
 import EyeOpen from '../../assets/icons/eye-open.svg'
 import EyeClose from '../../assets/icons/eye-close.svg'
+import axios from 'axios'
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -25,6 +27,31 @@ export default function Login() {
   const [userInfo, setUserInfo] = useLocalStorage('user_info', null);
 
   const { user, login } = useContext(AuthContext)
+
+  // Parse token data from URL if coming from auth callback
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tokenData = params.get('token_data');
+    
+    if (tokenData) {
+      try {
+        const parsedData = JSON.parse(tokenData);
+        if (parsedData.token) {
+          // Store the token
+          setAuthTokenLocal(parsedData.token);
+          
+          // Store user info
+          setUserInfo(parsedData.user_info);
+          
+          // Redirect to dashboard
+          navigate('/dashboard');
+          window.location.reload();
+        }
+      } catch (err) {
+        console.error("Failed to parse token data:", err);
+      }
+    }
+  }, [location, navigate, setAuthTokenLocal, setUserInfo]);
 
   if (user) {
     return <Navigate to="/dashboard" />
@@ -76,6 +103,28 @@ export default function Login() {
     }
   };
   
+  const handleKeycloakLogin = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/auth/`, {
+        params: {
+          redirect_uri: `${window.location.origin}/callback`
+        }
+      });
+      
+      if (response.data && response.data.auth_url) {
+        // Redirect to Keycloak
+        window.location.href = response.data.auth_url;
+      } else {
+        setError('Failed to generate authentication URL');
+      }
+    } catch (err) {
+      setError('Failed to initialize login process');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="login-container">
@@ -86,9 +135,14 @@ export default function Login() {
         </div>
 
         <div className="card-content">
-          <button className="social-button">
+          <button 
+            type="button" 
+            className="social-button"
+            onClick={handleKeycloakLogin}
+            disabled={loading}
+          >
             <img src={Github} alt="Github" className="social-icon" />
-            Continue with Github
+            {loading ? 'Please wait...' : 'Login with Keycloak'}
           </button>
 
           <div className="divider">
