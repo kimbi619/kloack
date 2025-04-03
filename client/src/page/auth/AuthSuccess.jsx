@@ -35,19 +35,14 @@ export default function AuthSuccess() {
         
         console.log('Processing token data:', parsedData);
         
-        // Store token in localStorage
         setAuthTokenLocal(parsedData.token);
         
-        // Store user info in localStorage
         setUserInfo(parsedData.user_info);
         
-        // Update auth context to reflect logged-in state
         login(parsedData.token, parsedData.user_info);
         
-        // Set loading to false
         setLoading(false);
         
-        // Redirect to dashboard after a short delay
         setTimeout(() => {
           navigate('/dashboard');
         }, 1500);
@@ -63,21 +58,16 @@ export default function AuthSuccess() {
   
   if (error) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div>
         <h2>Authentication Error</h2>
-        <p style={{ color: 'red' }}>{error}</p>
-        <button 
-          onClick={() => navigate('/')}
-          style={{ padding: '0.5rem 1rem', marginTop: '1rem' }}
-        >
-          Return to Home
-        </button>
+        <p>{error}</p>
+        <button onClick={() => navigate('/')} >Return to Home</button>
       </div>
     );
   }
   
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <div>
       <p>Processing authentication...</p>
     </div>
   );

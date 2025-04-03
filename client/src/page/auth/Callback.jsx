@@ -11,7 +11,6 @@ const Callback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the code from URL query parameters
         const searchParams = new URLSearchParams(location.search);
         const code = searchParams.get('code');
         
@@ -22,7 +21,6 @@ const Callback = () => {
         
         setStatus('Received authorization code, finalizing login...');
         
-        // Send the code to our backend to exchange for tokens
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/callback/`,
           {
@@ -33,15 +31,12 @@ const Callback = () => {
           }
         );
         
-        // Check the response
         if (response.data && response.data.success) {
           setStatus('Authentication successful! Redirecting...');
           
-          // Redirect to the URL provided by backend
           if (response.data.redirect_url) {
             window.location.href = response.data.redirect_url;
           } else {
-            // Fallback if no redirect URL
             navigate('/dashboard');
           }
         } else {

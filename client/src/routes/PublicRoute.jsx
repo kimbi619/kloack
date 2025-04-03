@@ -11,8 +11,6 @@ const PublicRoute = () => {
     <div>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} /> */}
         <Route path="/callback" element={<Callback />} />
         <Route path="/auth-success" element={<AuthSuccess />} />
       </Routes>
