@@ -64,7 +64,7 @@ services:
       - KEYCLOAK_URL=https://172.105.75.119:8443/auth
       - KEYCLOAK_REALM=kloack
       - KEYCLOAK_CLIENT_ID=backend-service
-      - KEYCLOAK_CLIENT_SECRET=lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK
+      - KEYCLOAK_CLIENT_SECRET=tBTmjljgnIGseGH2zJUhZMJMTZ7AY4Kb
     depends_on:
       - db
       - keycloak

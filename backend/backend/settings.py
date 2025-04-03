@@ -100,7 +100,7 @@ KEYCLOAK_CONFIG = {
     "SERVER_URL": os.getenv('KEYCLOAK_URL', 'http://172.105.75.119:8080/auth'),
     "REALM": os.getenv('KEYCLOAK_REALM', 'kloack'),
     "CLIENT_ID": os.getenv('KEYCLOAK_CLIENT_ID', 'test'),
-    "CLIENT_SECRET_KEY": os.getenv('KEYCLOAK_CLIENT_SECRET', 'VV5wKuapzwj3Q7lGoS0w2yhnu0jXbl3X'),
+    "CLIENT_SECRET_KEY": os.getenv('KEYCLOAK_CLIENT_SECRET', 'tBTmjljgnIGseGH2zJUhZMJMTZ7AY4Kb'),
     "VERIFY_SSL": False,  
 }
 
