@@ -79,7 +79,6 @@ services:
       - REACT_APP_KEYCLOAK_CLIENT_ID=backend-service
     depends_on:
       - backend
-      - keycloak
     restart: always
     command: sh -c "npm install && npm start"
 
