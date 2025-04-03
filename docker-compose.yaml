@@ -14,29 +14,38 @@ services:
       - "5433:5432"
     restart: always
 
-  # keycloak:
-  #   image: quay.io/keycloak/keycloak:22.0.1
-  #   container_name: "keycloak"
-  #   environment:
-  #     - KC_DB=postgres
-  #     - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
-  #     - KC_DB_USERNAME=postgres
-  #     - KC_DB_PASSWORD=prodigy
-  #     - KEYCLOAK_ADMIN=admin
-  #     - KEYCLOAK_ADMIN_PASSWORD=admin
-  #     - KC_HOSTNAME=172.105.75.119
-  #     - KC_HTTP_RELATIVE_PATH=/auth
-  #     - KC_PROXY=edge
-  #     - KC_HTTP_ENABLED=true
-  #     - KC_HOSTNAME_STRICT=false
-  #     - KC_HOSTNAME_STRICT_HTTPS=false
-  #   command:
-  #     - start-dev
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - db
-  #   restart: always
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: "keycloak"
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=prodigy
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=172.105.75.119
+      - KC_HTTP_RELATIVE_PATH=/auth
+      - KC_HTTPS_PORT=8443
+      - KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt
+      - KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key
+      - KC_PROXY=edge
+      - KC_HTTP_ENABLED=true
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_SPI_ALLOWED_ORIGINS="http://172.105.75.119:3001"
+    command:
+      - start
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ~/kloack/certs/server.crt:/opt/keycloak/conf/server.crt:ro
+      - ~/kloack/certs/server.key:/opt/keycloak/conf/server.key:ro
+    depends_on:
+      - db
+    restart: always
+    user: root  
       
   backend:
     build:
@@ -57,12 +66,13 @@ services:
       - POSTGRES_PASSWORD=prodigy
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - KEYCLOAK_URL=http://keycloak:8080/auth
+      - KEYCLOAK_URL=https://172.105.75.119:8443/auth
       - KEYCLOAK_REALM=kloack
       - KEYCLOAK_CLIENT_ID=backend-service
       - KEYCLOAK_CLIENT_SECRET=lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK
     depends_on:
       - db
+      - keycloak
     restart: always
 
   frontend:
@@ -73,15 +83,15 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - REACT_APP_BACKEND_URL=https://172.105.75.119/api
-      - REACT_APP_KEYCLOAK_URL=https://172.105.75.119/auth
+      - REACT_APP_BACKEND_URL=http://172.105.75.119:8000/api
+      - REACT_APP_KEYCLOAK_URL=https://172.105.75.119:8443/auth
       - REACT_APP_KEYCLOAK_REALM=kloack
       - REACT_APP_KEYCLOAK_CLIENT_ID=backend-service
     depends_on:
       - backend
+      - keycloak
     restart: always
     command: sh -c "npm install && npm start"
-
 
 volumes:
   postgres_data:
