@@ -41,7 +41,7 @@ services:
       - KEYCLOAK_URL=http://localhost:8080
       - KEYCLOAK_REALM=kloack
       - KEYCLOAK_CLIENT_ID=backend-service
-      - KEYCLOAK_CLIENT_SECRET=yQrcRopRHtIIC5QIkdR7fe2PR9rDCMwo
+      - KEYCLOAK_CLIENT_SECRET=lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK
     depends_on:
       - db
     restart: always

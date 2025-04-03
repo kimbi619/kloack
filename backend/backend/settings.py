@@ -91,10 +91,10 @@ KEYCLOAK_EXEMPT_URIS = []
 # KEYCLOAK_CACHE_TTL: number of seconds to cache keyclaok public
 
 KEYCLOAK_CONFIG = {
-    "SERVER_URL": os.getenv('KEYCLOAK_URL'),
-    "REALM": os.getenv('KEYCLOAK_REALM'),
-    "CLIENT_ID": os.getenv('KEYCLOAK_CLIENT_ID'),
-    "CLIENT_SECRET_KEY": os.getenv('KEYCLOAK_CLIENT_SECRET'),
+    "SERVER_URL": os.getenv('KEYCLOAK_URL', ),
+    "REALM": os.getenv('KEYCLOAK_REALM', 'kloack'),
+    "CLIENT_ID": os.getenv('KEYCLOAK_CLIENT_ID', 'backend-service'),
+    "CLIENT_SECRET_KEY": os.getenv('KEYCLOAK_CLIENT_SECRET', 'lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK'),
     "VERIFY_SSL": False,  
 }
 

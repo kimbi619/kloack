@@ -31,7 +31,7 @@ const apiRequest = async (method, url, data = null, customHeaders = {}) => {
       }
     }
 
-    const response = await apiClREACT_APP_KEYCLOAK_CLIENT_SECRETient(config);
+    const response = await apiClient(config);
     return { success: true, data: response.data };
   } catch (error) {
     console.error('API Error:', error);
@@ -46,7 +46,7 @@ const apiRequest = async (method, url, data = null, customHeaders = {}) => {
 export const keycloakAuth = async (username, password) => {
   const payload = {
     client_id: CLIENT_ID,
-    client_secret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET || 'yQrcRopRHtIIC5QIkdR7fe2PR9rDCMwo',
+    client_secret: process.env.REACT_APP_KEYCLOAK_CLIENT_SECRET || 'lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK',
     grant_type: 'password',
     username,
     password
