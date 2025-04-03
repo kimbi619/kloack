@@ -65,6 +65,7 @@ services:
       - KEYCLOAK_REALM=kloack
       - KEYCLOAK_CLIENT_ID=backend-service
       - KEYCLOAK_CLIENT_SECRET=tBTmjljgnIGseGH2zJUhZMJMTZ7AY4Kb
+      - PYTHONWARNINGS=ignore:Unverified HTTPS request
     depends_on:
       - db
       - keycloak
@@ -90,4 +91,4 @@ services:
 
 volumes:
   postgres_data:
-    external: false 
+    external: false

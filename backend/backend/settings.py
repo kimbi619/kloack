@@ -1,5 +1,8 @@
 from pathlib import Path
 import os
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -97,9 +100,9 @@ KEYCLOAK_EXEMPT_URIS = []
 # KEYCLOAK_CACHE_TTL: number of seconds to cache keyclaok public
 
 KEYCLOAK_CONFIG = {
-    "SERVER_URL": os.getenv('KEYCLOAK_URL', 'http://172.105.75.119:8080/auth'),
+    "SERVER_URL": os.getenv('KEYCLOAK_URL', 'https://172.105.75.119:8443/auth'),
     "REALM": os.getenv('KEYCLOAK_REALM', 'kloack'),
-    "CLIENT_ID": os.getenv('KEYCLOAK_CLIENT_ID', 'test'),
+    "CLIENT_ID": os.getenv('KEYCLOAK_CLIENT_ID', 'backend-service'),
     "CLIENT_SECRET_KEY": os.getenv('KEYCLOAK_CLIENT_SECRET', 'tBTmjljgnIGseGH2zJUhZMJMTZ7AY4Kb'),
     "VERIFY_SSL": False,  
 }

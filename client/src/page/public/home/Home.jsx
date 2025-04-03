@@ -11,14 +11,19 @@ const Home = () => {
       setLoading(true);
       setError(null);
       
+      const callbackUrl = `${window.location.origin}/callback`;
+      console.log('Request to auth endpoint with callback:', callbackUrl);
+      
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL || 'http://172.105.75.119:8000/api'}/auth/`, 
         {
           params: {
-            redirect_uri: `${window.location.origin}/callback`
+            redirect_uri: callbackUrl
           }
         }
       );
+      
+      console.log('Auth response:', response.data);
       
       if (response.data && response.data.auth_url) {
         window.location.href = response.data.auth_url;
@@ -27,7 +32,7 @@ const Home = () => {
       }
     } catch (err) {
       console.error('Error initiating Keycloak login:', err);
-      setError('Failed to connect to authentication server');
+      setError(`Failed to connect to authentication server: ${err.message}`);
     } finally {
       setLoading(false);
     }

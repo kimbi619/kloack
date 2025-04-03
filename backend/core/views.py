@@ -44,14 +44,18 @@ def authenticate(request):
     """
     Generate a Keycloak authorization URL for redirecting the user to login
     """
-    redirect_uri = request.GET.get('redirect_uri', 'http://172.105.75.119:3000/callback')
+    redirect_uri = request.GET.get('redirect_uri', 'http://172.105.75.119:3001/callback')
     
     try:
+        print(f"Keycloak Config: {settings.KEYCLOAK_CONFIG}")
+        print(f"Redirect URI: {redirect_uri}")
+        
         keycloak_openid = KeycloakOpenID(
             server_url=settings.KEYCLOAK_CONFIG["SERVER_URL"],
             client_id=settings.KEYCLOAK_CONFIG["CLIENT_ID"],
             realm_name=settings.KEYCLOAK_CONFIG["REALM"],
-            client_secret_key=settings.KEYCLOAK_CONFIG["CLIENT_SECRET_KEY"]
+            client_secret_key=settings.KEYCLOAK_CONFIG["CLIENT_SECRET_KEY"],
+            verify=False  
         )
         
         auth_url = keycloak_openid.auth_url(
@@ -59,8 +63,12 @@ def authenticate(request):
             scope="openid email profile"
         )
         
+        print(f"Generated auth URL: {auth_url}")
         return JsonResponse({"auth_url": auth_url})
     except Exception as e:
+        import traceback
+        print(f"Keycloak Auth Error: {str(e)}")
+        print(traceback.format_exc())
         return JsonResponse({"error": str(e)}, status=500)
 
 
