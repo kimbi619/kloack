@@ -14,29 +14,29 @@ services:
       - "5433:5432"
     restart: always
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:22.0.1
-    container_name: "keycloak"
-    environment:
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=prodigy
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HOSTNAME=172.105.75.119
-      - KC_HTTP_RELATIVE_PATH=/auth
-      - KC_PROXY=edge
-      - KC_HTTP_ENABLED=true
-      - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
-    command:
-      - start-dev
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    restart: always
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:22.0.1
+  #   container_name: "keycloak"
+  #   environment:
+  #     - KC_DB=postgres
+  #     - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
+  #     - KC_DB_USERNAME=postgres
+  #     - KC_DB_PASSWORD=prodigy
+  #     - KEYCLOAK_ADMIN=admin
+  #     - KEYCLOAK_ADMIN_PASSWORD=admin
+  #     - KC_HOSTNAME=172.105.75.119
+  #     - KC_HTTP_RELATIVE_PATH=/auth
+  #     - KC_PROXY=edge
+  #     - KC_HTTP_ENABLED=true
+  #     - KC_HOSTNAME_STRICT=false
+  #     - KC_HOSTNAME_STRICT_HTTPS=false
+  #   command:
+  #     - start-dev
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #   restart: always
       
   backend:
     build:
@@ -84,21 +84,6 @@ services:
     restart: always
     command: sh -c "npm install && npm start"
 
-  nginx:
-    image: nginx:alpine
-    container_name: "nginx"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/logs:/var/log/nginx
-    depends_on:
-      - keycloak
-      - backend
-      - frontend
-    restart: always
 
 volumes:
   postgres_data:
