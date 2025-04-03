@@ -44,7 +44,7 @@ def authenticate(request):
     """
     Generate a Keycloak authorization URL for redirecting the user to login
     """
-    redirect_uri = request.GET.get('redirect_uri', 'http://localhost:3000/callback')
+    redirect_uri = request.GET.get('redirect_uri', 'http://172.105.75.119:3000/callback')
     
     try:
         keycloak_openid = KeycloakOpenID(
@@ -71,7 +71,7 @@ def callback(request):
     Handle the callback from Keycloak after successful authentication
     """
     code = request.GET.get('code')
-    redirect_uri = request.GET.get('redirect_uri', 'http://localhost:3000/callback')
+    redirect_uri = request.GET.get('redirect_uri', 'http://172.105.75.119:3000/callback')
     
     if not code:
         return JsonResponse({"error": "No authorization code provided"}, status=400)

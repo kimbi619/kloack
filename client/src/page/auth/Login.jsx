@@ -106,7 +106,7 @@ export default function Login() {
   const handleKeycloakLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000'}/api/auth/`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL || 'http://172.105.75.119:8000'}/api/auth/`, {
         params: {
           redirect_uri: `${window.location.origin}/callback`
         }

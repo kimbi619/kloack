@@ -1,8 +1,6 @@
 version: '3.3'
 
 services:
-  
-
   db:
     image: "postgres:14-alpine"
     container_name: "postgres"
@@ -16,7 +14,25 @@ services:
       - "5433:5432"
     restart: always
 
-
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: "keycloak"
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=prodigy
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=localhost
+      - KC_HTTP_RELATIVE_PATH=/auth
+    command:
+      - start-dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    restart: always
       
   backend:
     build:
@@ -26,7 +42,6 @@ services:
     command: >
       sh -c "python run.py migrate &&
       python run.py runserver 0.0.0.0:8000"
-
     volumes:
       - ./backend:/app
     ports:
@@ -38,12 +53,13 @@ services:
       - POSTGRES_PASSWORD=prodigy
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - KEYCLOAK_URL=https://172.105.75.119:8443
+      - KEYCLOAK_URL=http://keycloak:8080/auth
       - KEYCLOAK_REALM=kloack
       - KEYCLOAK_CLIENT_ID=backend-service
       - KEYCLOAK_CLIENT_SECRET=lxsFEPWDeW9gM8NvCX1DISuFNWQeHOIK
     depends_on:
       - db
+      - keycloak
     restart: always
 
   frontend:
@@ -53,11 +69,16 @@ services:
     container_name: "client"
     ports:
       - "3001:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+      - REACT_APP_KEYCLOAK_URL=http://localhost:8080/auth
+      - REACT_APP_KEYCLOAK_REALM=kloack
+      - REACT_APP_KEYCLOAK_CLIENT_ID=backend-service
     depends_on:
       - backend
+      - keycloak
     restart: always
     command: sh -c "npm install && npm start"
-
 
 volumes:
   postgres_data:
